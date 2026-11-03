@@ -5,7 +5,7 @@ from playwright.sync_api import sync_playwright
 
 URL = "https://tickets.chapecoense.com/categoria/ingressos"
 NTFY_TOPIC = "ingressos_vasco"
-TERMO_BUSCA = "mirassol"  # Altere para "vasco" depois de testar
+TERMO_BUSCA = "vasco"  # Altere para "vasco" depois de testar
 
 def horario_brasilia():
     fuso_br = timezone(timedelta(hours=-3))
