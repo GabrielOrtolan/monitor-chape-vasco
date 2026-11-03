@@ -5,7 +5,7 @@ from playwright.sync_api import sync_playwright
 
 URL = "https://tickets.chapecoense.com/categoria/ingressos"
 NTFY_TOPIC = "ingressos_vasco"
-TERMO_BUSCA = "Mirassol"
+TERMO_BUSCA = "mirassol"  # Altere para "vasco" depois de testar
 
 def horario_brasilia():
     fuso_br = timezone(timedelta(hours=-3))
@@ -34,26 +34,30 @@ def verificar_site():
         page = context.new_page()
 
         print(f"[{hora}] Acessando {URL}...")
-        page.goto(URL, wait_until="networkidle", timeout=60000)
-        page.wait_for_timeout(5000)
+        page.goto(URL, wait_until="load", timeout=60000)
+        
+        # Aguarda 10 segundos extras para garantir que o JavaScript e a API renderizaram os cards
+        page.wait_for_timeout(10000)
 
-        conteudo_visivel = page.inner_text("body").lower()
-        html_completo = page.content().lower()
+        # Recolhe todo o texto visível na página de ponta a ponta
+        conteudo_visivel = page.locator("body").inner_text().lower()
         browser.close()
 
-        if TERMO_BUSCA in conteudo_visivel or TERMO_BUSCA in html_completo:
-            print("JOGO ENCONTRADO! Enviando alerta urgente...")
+        print(f"Texto lido na página (tamanho): {len(conteudo_visivel)} caracteres")
+
+        if TERMO_BUSCA in conteudo_visivel:
+            print("TERMO ENCONTRADO! Enviando alerta urgente...")
             enviar_notificacao(
-                mensagem=f"[{hora}] CORRE! Os ingressos para Chapecoense x Vasco saíram! Toque para abrir.",
-                titulo="INGRESSOS LIBERADOS!",
+                mensagem=f"[{hora}] SUCESSO! Encontrei '{TERMO_BUSCA}' na página da Chape!",
+                titulo="TERMO ENCONTRADO!",
                 prioridade="urgent",
                 tags="rotating_light,soccer"
             )
         else:
-            print("Ainda nada. Enviando status negativo...")
+            print(f"Termo '{TERMO_BUSCA}' não encontrado no texto visível.")
             enviar_notificacao(
-                mensagem=f"[{hora}] Verificado: Ainda sem ingressos do Vasco no site.",
-                titulo="Monitor Chape x Vasco: Nada ainda",
+                mensagem=f"[{hora}] Verificado: '{TERMO_BUSCA}' ainda não detectado.",
+                titulo="Monitor: Nada ainda",
                 prioridade="default",
                 tags="hourglass"
             )
@@ -66,7 +70,7 @@ if __name__ == "__main__":
         print(f"Erro durante a execução: {e}")
         enviar_notificacao(
             mensagem=f"[{hora}] Falha ao acessar o site da Chape: {str(e)[:100]}",
-            titulo="Erro no Monitor de Ingressos",
+            titulo="Erro no Monitor",
             prioridade="default",
             tags="warning"
         )
