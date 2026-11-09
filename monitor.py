@@ -35,7 +35,7 @@ def disparar_alarme_30x():
         print(f"Disparando alerta {i}/30...")
         enviar_notificacao(
             mensagem=f"[{i}/30 - {hora}] ACORDA! Os ingressos de Chapecoense x Vasco saíram! Toque para comprar!",
-            titulo="🚨 ACORDA! INGRESSOS LIBERADOS! 🚨",
+            titulo="ACORDA! INGRESSOS LIBERADOS!",
             prioridade="urgent",
             tags="rotating_light,soccer,loudspeaker"
         )
