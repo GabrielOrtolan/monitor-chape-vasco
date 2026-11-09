@@ -39,7 +39,6 @@ def disparar_alarme_30x():
             prioridade="urgent",
             tags="rotating_light,soccer,loudspeaker"
         )
-        # Pausa de 2 segundos para tocar continuamente por 1 minuto sem tomar bloqueio (rate limit) do ntfy
         time.sleep(2)
 
 def verificar_site():
@@ -66,14 +65,13 @@ def verificar_site():
             print("JOGO DO VASCO ENCONTRADO!")
             disparar_alarme_30x()
         else:
-            print(f"[{hora}] Ainda sem ingressos do Vasco. Seguindo monitoramento em silêncio...")
-            # Se quiser que continue avisando mesmo quando não achar, basta remover o '#' das 5 linhas abaixo:
-            # enviar_notificacao(
-            #     mensagem=f"[{hora}] Verificado: Ainda sem ingressos do Vasco.",
-            #     titulo="Monitor: Nada ainda",
-            #     prioridade="low",
-            #     tags="hourglass"
-            # )
+            print(f"[{hora}] Ainda sem ingressos do Vasco. Enviando status...")
+            enviar_notificacao(
+                mensagem=f"[{hora}] Verificado: Ainda sem ingressos do Vasco no site.",
+                titulo="Monitor Chape x Vasco: Nada ainda",
+                prioridade="default",
+                tags="hourglass"
+            )
 
 if __name__ == "__main__":
     try:
@@ -81,4 +79,11 @@ if __name__ == "__main__":
     except Exception as e:
         hora = horario_brasilia()
         print(f"Erro durante a execução: {e}")
+        enviar_notificacao(
+            mensagem=f"[{hora}] Falha ao acessar o site da Chape: {str(e)[:100]}",
+            titulo="Erro no Monitor",
+            prioridade="default",
+            tags="warning"
+        )
         sys.exit(1)
+
